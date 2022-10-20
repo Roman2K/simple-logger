@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+
+load "./simple_logger_test.rb"
