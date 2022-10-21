@@ -22,9 +22,9 @@ class AppendersTest < Minitest::Test
     )
 
     log[foo: "bar"].info "test"
-    assert_equal <<~EOS, io.string
-      level=info msg=test foo=bar
-    EOS
+    assert_match %r{
+      ^time=\S+\ level=info\ msg=test\ foo=bar$
+    }x, io.string
   end
 
   def test_LogfmtHuman

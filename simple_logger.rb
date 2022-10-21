@@ -1,5 +1,7 @@
 class SimpleLogger
-  autoload :Appenders, __dir__ + '/simple_logger/appenders'
+  dir = __dir__ + '/simple_logger'
+  autoload :Appenders, dir + '/appenders'
+  autoload :Formatters, dir + '/formatters'
 
   LEVELS = %i[debug info warn error].freeze
 
@@ -77,8 +79,9 @@ private
 
   def append(level_idx, msg)
     entry = {
+      time:  Time.now,
       level: LEVELS.fetch(level_idx),
-      msg: [@prefix, msg].compact.join(": "),
+      msg:   [@prefix, msg].compact.join(": "),
     }.merge(@labels).freeze
 
     @appender.append(entry)

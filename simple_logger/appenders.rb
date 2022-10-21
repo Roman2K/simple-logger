@@ -43,42 +43,39 @@ module Appenders
     end
   end
 
-  # See https://brandur.org/logfmt
   class Logfmt
-    def self.format_labels(labels)
-      labels.map { |label, value|
-        value = value.to_s
-        value = %("#{value}") if value =~ /\s/
-        "#{label}=#{value}"
-      }.join " "
-    end
-
-    def initialize(appender)
+    def initialize(appender, **logfmt_opts)
       @appender = appender
+      @logfmt_format = Formatters::Logfmt.new(**logfmt_opts)
     end
 
     def append(entry)
-      @appender.append(self.class.format_labels(entry))
+      @appender.append(format_entry(entry))
+    end
+
+  protected
+
+    def format_entry(entry)
+      @logfmt_format.format(entry)
     end
   end
 
-  class LogfmtHuman
+  class LogfmtHuman < Logfmt
     LEVELS_WIDTH = LEVELS.map(&:length).max
 
-    def initialize(appender)
-      @appender = appender
-    end
+  protected
 
-    def append(entry)
+    def format_entry(entry)
       entry = entry.dup
+      entry.delete(:time)
       msg = entry.delete(:msg) or raise "missing `msg`"
       level = entry.delete(:level) or raise "missing `label`"
 
-      labels = Logfmt.format_labels(entry)
+      labels = super(entry)
       msg = "%*s %s" % [LEVELS_WIDTH, level.upcase, msg]
       msg << " " << labels unless labels.empty?
 
-      @appender.append(msg)
+      msg
     end
   end
 end
