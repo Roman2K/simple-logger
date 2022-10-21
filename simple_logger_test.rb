@@ -16,6 +16,7 @@ class SimpleLoggerTest < Minitest::Test
 
   def test_message
     @log.debug "test"
+
     assert_equal <<~EOS, @io.string
       DEBUG test
     EOS
@@ -23,6 +24,7 @@ class SimpleLoggerTest < Minitest::Test
 
   def test_sub
     @log.sub("foo").debug "test"
+
     assert_equal <<~EOS, @io.string
       DEBUG foo: test
     EOS
@@ -30,6 +32,7 @@ class SimpleLoggerTest < Minitest::Test
 
   def test_sub_sub
     @log.sub("foo").sub("bar").debug "test"
+
     assert_equal <<~EOS, @io.string
       DEBUG foo: bar: test
     EOS
@@ -37,6 +40,7 @@ class SimpleLoggerTest < Minitest::Test
 
   def test_sub_with_labels
     @log.sub("foo", bar: "baz").debug "test"
+
     assert_equal <<~EOS, @io.string
       DEBUG foo: test bar=baz
     EOS
@@ -44,6 +48,7 @@ class SimpleLoggerTest < Minitest::Test
 
   def test_labels_overriding
     @log.sub(bar: "baz")[bar: "foo"].debug "test"
+
     assert_equal <<~EOS, @io.string
       DEBUG test bar=foo
     EOS
@@ -51,6 +56,7 @@ class SimpleLoggerTest < Minitest::Test
 
   def test_label_overriding_with_prefix
     @log.sub("foo", bar: "baz", baz: "quux")[baz: "foo"].debug "test"
+
     assert_equal <<~EOS, @io.string
       DEBUG foo: test bar=baz baz=foo
     EOS
@@ -58,9 +64,21 @@ class SimpleLoggerTest < Minitest::Test
 
   def test_measure
     @log.sub("foo").debug("test") { 1+1 }
+
     assert_equal <<~EOS, replace_times(@io.string)
       DEBUG foo: test...
       DEBUG foo: test elapsed=TIME0
+    EOS
+  end
+
+  def test_measure_log_level
+    refute_equal :info, @log.level
+
+    @log.sub("foo").info("test") { 1+1 }
+
+    assert_equal <<~EOS, replace_times(@io.string)
+      \ INFO foo: test...
+      \ INFO foo: test elapsed=TIME0
     EOS
   end
 
@@ -68,6 +86,7 @@ class SimpleLoggerTest < Minitest::Test
     @log.sub("foo").debug("test1") do
       @log.sub("bar").debug("test2")
     end
+
     assert_equal <<~EOS, replace_times(@io.string)
       DEBUG foo: test1...
       DEBUG bar: test2

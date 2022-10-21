@@ -6,7 +6,7 @@ Unopinionated but tries to ease ingestion and transformations through
 [Loki][loki]'s [Promtail][promtail], mainly by way of a [Logfmt][logfmt]
 appender.
 
-[loki]: https://grafana.com/logs/
+[loki]: https://grafana.com/oss/loki/
 [promtail]: https://grafana.com/docs/loki/latest/clients/promtail/
 [logfmt]: https://brandur.org/logfmt
 
@@ -14,6 +14,7 @@ TODO:
 
 * [ ] Precise durations
   * [ ] Formatted within LogfmtHuman only
+* [ ] Proper escaping of label names and values
 * [ ] Log exception backtraces (with chains of causes)
 * [ ] Add FATAL level to log and raise exceptions
 

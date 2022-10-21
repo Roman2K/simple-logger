@@ -45,6 +45,16 @@ protected
     self.class
   end
 
+  def append(level_idx, msg)
+    entry = {
+      time:  Time.now,
+      level: LEVELS.fetch(level_idx),
+      msg:   [@prefix, msg].compact.join(": "),
+    }.merge(@labels).freeze
+
+    @appender.append(entry)
+  end
+
 private
 
   def append_prefix(prefix)
@@ -69,22 +79,12 @@ private
     if block_given?
       append(level_idx, "#{msg}...")
       elapsed = measure { result = yield }
-      sub(elapsed: format_duration(elapsed)).public_send(level, msg)
+      sub(elapsed: format_duration(elapsed)).append(level_idx, msg)
     else
       append(level_idx, msg)
     end
 
     result
-  end
-
-  def append(level_idx, msg)
-    entry = {
-      time:  Time.now,
-      level: LEVELS.fetch(level_idx),
-      msg:   [@prefix, msg].compact.join(": "),
-    }.merge(@labels).freeze
-
-    @appender.append(entry)
   end
 
   def format_exception(e)
