@@ -1,3 +1,9 @@
 #!/usr/bin/env ruby
 
-load "./simple_logger_test.rb"
+require 'bundler'
+
+Bundler.require :default, :test
+
+require 'utils'
+
+Utils::TestFiles.load_from_argv dir: '.'

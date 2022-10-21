@@ -1,10 +1,12 @@
 class SimpleLogger
+  autoload :Appenders, __dir__ + '/simple_logger/appenders'
+
   LEVELS = %i[debug info warn error].freeze
 
   def initialize(level: LEVELS.first, prefix: nil, labels: {}, appender: nil)
     @prefix   = prefix
     @labels   = sanitize_labels(labels)
-    @appender = appender || Appenders::Noop.new
+    @appender = appender || Appenders::Logfmt.new(Appenders.stderr)
 
     self.level = level
   end
@@ -103,58 +105,5 @@ private
     t0 = Time.now
     yield
     Time.now - t0
-  end
-
-  module Appenders
-    class Noop
-      def append(entry)
-      end
-    end
-
-    class Logfmt
-      def initialize(io)
-        @io = io
-        @mutex = Mutex.new
-      end
-
-      def append(entry)
-        @mutex.synchronize { do_append(entry) }
-      end
-
-    private
-
-      def do_append(entry)
-        @io.write "#{format_entry entry}\n"
-      end
-
-      def format_entry(entry)
-        msg = entry.fetch(:msg)
-
-        result = "#{msg}"
-        entry.each do |label, value|
-          next if label == :msg
-          value = %("#{value}") if /\s/ === value
-          result << " #{label}=#{value}"
-        end
-
-        result
-      end
-    end
-
-    class LogfmtWithLevels < Logfmt
-      LEVELS_WIDTH = LEVELS.map(&:length).max
-
-    private
-
-      def format_entry(entry)
-        msg = entry.fetch(:msg)
-        level = entry.fetch(:level)
-
-        msg = "%*s %s" % [LEVELS_WIDTH, level.upcase, msg]
-        entry = entry.reject { |k,| k == :level }.merge(msg: msg)
-
-        super(entry)
-      end
-    end
   end
 end

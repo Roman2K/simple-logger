@@ -8,7 +8,9 @@ class SimpleLoggerTest < Minitest::Test
     @io = StringIO.new
     @log = SimpleLogger.new(
       level: :debug,
-      appender: SimpleLogger::Appenders::LogfmtWithLevels.new(@io),
+      appender: SimpleLogger::Appenders::LogfmtHuman.new(
+        SimpleLogger::Appenders::IO.new(@io),
+      ),
     )
   end
 

@@ -1,13 +1,29 @@
+GIT
+  remote: https://github.com/Roman2K/utils-ruby.git
+  revision: 3226ef433b0d4f1ba84b6e60fe52087892f692c4
+  specs:
+    utils-ruby (0.1.0)
+      net_http_unix (~> 0.2)
+      simple-logger
+
+PATH
+  remote: .
+  specs:
+    simple-logger (0.1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
     minitest (5.16.3)
+    net_http_unix (0.2.2)
 
 PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
   minitest
+  simple-logger!
+  utils-ruby!
 
 BUNDLED WITH
    2.3.22
