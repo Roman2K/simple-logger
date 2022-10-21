@@ -6,9 +6,10 @@ require 'stringio'
 class SimpleLoggerTest < Minitest::Test
   def setup
     @io = StringIO.new
-
-    appender = SimpleLogger::Appenders::LogfmtWithLevels.new(@io)
-    @log = SimpleLogger.new appenders: [appender]
+    @log = SimpleLogger.new(
+      level: :debug,
+      appender: SimpleLogger::Appenders::LogfmtWithLevels.new(@io),
+    )
   end
 
   def test_message

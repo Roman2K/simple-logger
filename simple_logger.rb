@@ -1,10 +1,10 @@
 class SimpleLogger
-  LEVELS = %i( debug info warn error ).freeze
+  LEVELS = %i[debug info warn error].freeze
 
-  def initialize(level: LEVELS.first, prefix: nil, labels: {}, appenders: [])
-    @prefix    = prefix
-    @labels    = sanitize_labels(labels)
-    @appenders = appenders
+  def initialize(level: LEVELS.first, prefix: nil, labels: {}, appender: nil)
+    @prefix   = prefix
+    @labels   = sanitize_labels(labels)
+    @appender = appender || Appenders::Noop.new
 
     self.level = level
   end
@@ -22,7 +22,7 @@ class SimpleLogger
       level: level,
       prefix: append_prefix(prefix),
       labels: @labels.merge(sanitize_labels(labels)),
-      appenders: @appenders,
+      appender: @appender,
     )
   end
   alias sub []
@@ -74,14 +74,12 @@ private
   end
 
   def append(level_idx, msg)
-    entry = @labels.merge(
+    entry = {
       level: LEVELS.fetch(level_idx),
       msg: [@prefix, msg].compact.join(": "),
-    ).freeze
+    }.merge(@labels).freeze
 
-    @appenders.each do |appender|
-      appender.append(entry)
-    end
+    @appender.append(entry)
   end
 
   def format_exception(e)
@@ -108,6 +106,11 @@ private
   end
 
   module Appenders
+    class Noop
+      def append(entry)
+      end
+    end
+
     class Logfmt
       def initialize(io)
         @io = io
