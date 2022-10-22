@@ -14,7 +14,8 @@ TODO:
 
 * [ ] Precise durations
   * [ ] Formatted within LogfmtHuman only
-* [ ] Proper escaping of label names and values
+* [x] Proper escaping of label names and values
+* [x] Handle boolean labels
 * [ ] Log exception backtraces (with chains of causes)
 * [ ] Add FATAL level to log and raise exceptions
 

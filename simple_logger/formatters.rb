@@ -9,13 +9,30 @@ class Logfmt
   end
 
   def format(labels)
-    labels.map { |label, value|
-      value = @time_format.format(value) if label == :time
-      value = value.to_s
-      value = %("#{value}") if value =~ /\s/
+    labels.map { format_pair(_1, _2) }.join " "
+  end
 
-      "#{label}=#{value}"
-    }.join " "
+private
+
+  def format_pair(label, value)
+    result = "#{format_label(label)}"
+    return result if value == true
+    result << "=" << format_value(value)
+  end
+
+  RE_QUOTING_NEEDED = /\s|[[:cntrl:]]/
+
+  def format_label(label)
+    label = label.to_s
+    raise "invalid label: #{label.inspect}" if label =~ RE_QUOTING_NEEDED
+    label
+  end
+
+  def format_value(value)
+    value = @time_format.format(value) if Time === value
+    value = "#{value}"
+    value = value.dump if value =~ RE_QUOTING_NEEDED
+    value
   end
 end
 
