@@ -65,8 +65,12 @@ private
 
   def sanitize_labels(labels)
     labels.transform_values do |value|
-      value = format_exception(value) if Exception === value
-      value.to_s
+      case value
+      when Exception
+        format_exception(value)
+      else
+        value
+      end
     end
   end
 
@@ -78,8 +82,8 @@ private
 
     if block_given?
       append(level_idx, "#{msg}...")
-      elapsed = measure { result = yield }
-      sub(elapsed: format_duration(elapsed)).append(level_idx, msg)
+      duration = measure { result = yield }
+      sub(duration: duration).append(level_idx, msg)
     else
       append(level_idx, msg)
     end
@@ -98,10 +102,6 @@ private
       e = e.cause or break
     end
     causes.join(" < ")
-  end
-
-  def format_duration(duration)
-    "%.2fs" % [duration]
   end
 
   def measure

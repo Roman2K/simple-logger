@@ -61,12 +61,16 @@ module Appenders
   end
 
   class LogfmtHuman < Logfmt
-    LEVELS_WIDTH = LEVELS.map(&:length).max
+    LEVELS_WIDTH   = LEVELS.map(&:length).max
+    DURATION_LABEL = :duration
 
   protected
 
     def format_entry(entry)
       entry = entry.dup
+
+      format_values!(entry)
+
       entry.delete(:time)
       msg = entry.delete(:msg) or raise "missing `msg`"
       level = entry.delete(:level) or raise "missing `label`"
@@ -76,6 +80,22 @@ module Appenders
       msg << " " << labels unless labels.empty?
 
       msg
+    end
+
+    def format_values!(entry)
+      if value = entry[DURATION_LABEL]
+        entry[DURATION_LABEL] = format_duration(value)
+      end
+    end
+
+    def format_duration(value)
+      return value unless Numeric === value
+
+      if value < 1
+        "%dms" % [value * 1000]
+      else
+        "%.2fs" % [value]
+      end
     end
   end
 end

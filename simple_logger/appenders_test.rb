@@ -38,18 +38,44 @@ class AppendersTest < Minitest::Test
       \ INFO test
     EOS
 
-    io.rewind
+    io.reopen ""
 
     log[foo: "bar"].info "test"
     assert_equal <<~EOS, io.string
       \ INFO test foo=bar
     EOS
 
-    io.rewind
+    io.reopen ""
 
     log[foo: "bar baz"].info "test"
     assert_equal <<~EOS, io.string
       \ INFO test foo="bar baz"
+    EOS
+  end
+
+  def test_LogfmtHuman_duration
+    io = StringIO.new
+    log = SimpleLogger.new(
+      appender: Appenders::LogfmtHuman.new(Appenders.stdio(io))
+    )
+
+    log[duration: 1.23, a_float: 1.23].debug "test"
+    assert_equal <<~EOS, io.string
+      DEBUG test duration=1.23s a_float=1.23
+    EOS
+
+    io.reopen ""
+
+    log[duration: 0.999].debug "test"
+    assert_equal <<~EOS, io.string
+      DEBUG test duration=999ms
+    EOS
+
+    io.reopen ""
+
+    log[duration: "a string"].debug "test"
+    assert_equal <<~EOS, io.string
+      DEBUG test duration="a string"
     EOS
   end
 end

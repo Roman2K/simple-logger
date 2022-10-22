@@ -67,7 +67,7 @@ class SimpleLoggerTest < Minitest::Test
 
     assert_equal <<~EOS, replace_times(@io.string)
       DEBUG foo: test...
-      DEBUG foo: test elapsed=TIME0
+      DEBUG foo: test duration=TIME0
     EOS
   end
 
@@ -78,7 +78,7 @@ class SimpleLoggerTest < Minitest::Test
 
     assert_equal <<~EOS, replace_times(@io.string)
       \ INFO foo: test...
-      \ INFO foo: test elapsed=TIME0
+      \ INFO foo: test duration=TIME0
     EOS
   end
 
@@ -90,7 +90,7 @@ class SimpleLoggerTest < Minitest::Test
     assert_equal <<~EOS, replace_times(@io.string)
       DEBUG foo: test1...
       DEBUG bar: test2
-      DEBUG foo: test1 elapsed=TIME0
+      DEBUG foo: test1 duration=TIME0
     EOS
   end
 
@@ -119,6 +119,6 @@ class SimpleLoggerTest < Minitest::Test
 
   private def replace_times(s)
     n = -1
-    s.gsub(/( elapsed=)\S+/) { "#{$1}TIME%d" % [n += 1] }
+    s.gsub(/( duration=)\S+/) { "#{$1}TIME%d" % [n += 1] }
   end
 end

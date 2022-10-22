@@ -12,12 +12,12 @@ appender.
 
 TODO:
 
-* [ ] Precise durations
-  * [ ] Formatted within LogfmtHuman only
+* [x] Precise durations
+  * [x] Formatted within LogfmtHuman only
 * [x] Proper escaping of label names and values
 * [x] Handle boolean labels
 * [ ] Log exception backtraces (with chains of causes)
-* [ ] Add FATAL level to log and raise exceptions
+* [ ] Add FATAL level to both log and raise exceptions at once
 
 ## Usage
 
