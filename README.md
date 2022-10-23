@@ -3,11 +3,12 @@
 Simple structured logger for Ruby.
 
 Unopinionated but tries to ease ingestion and transformations through
-[Loki][loki]'s [Promtail][promtail], mainly by way of a [Logfmt][logfmt]
-appender.
+[Loki][loki]'s [Promtail][promtail]/[Grafana Agent][grafana_agent], mainly by
+way of a [Logfmt][logfmt] appender.
 
 [loki]: https://grafana.com/oss/loki/
 [promtail]: https://grafana.com/docs/loki/latest/clients/promtail/
+[grafana_agent]: https://grafana.com/docs/agent/
 [logfmt]: https://brandur.org/logfmt
 
 TODO:
@@ -112,6 +113,12 @@ See `Appenders` for alternative formats.
 Example using the human-friendly Logfmt-based appender:
 
 ```ruby
+log = SimpleLogger.new(
+  appender: SimpleLogger::Appenders.pipe(:LogfmtHuman).pipe(:stderr),
+)
+
+# Equivalent to:
+
 log = SimpleLogger.new(
   appender: SimpleLogger::Appenders::LogfmtHuman.new(
     SimpleLogger::Appenders.stderr,

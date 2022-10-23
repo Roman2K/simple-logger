@@ -1,6 +1,17 @@
 class SimpleLogger
 
 module Appenders
+  # Example:
+  #
+  #   Appenders.
+  #     pipe(:OpenTelemetryContext).
+  #     pipe(:Logfmt).
+  #     pipe(:stderr)
+  #
+  def self.pipe(...)
+    Pipeline.new.pipe(...)
+  end
+
   def self.stderr
     stdio($stderr)
   end
@@ -106,6 +117,41 @@ module Appenders
       else
         "%.2fs" % [value]
       end
+    end
+  end
+
+  class Pipeline
+    def initialize
+      @stages = []
+    end
+
+    def pipe(stage, ...)
+      case stage
+      when /^[A-Z]/
+        pipe(Appenders.const_get(stage), ...)
+      when Class
+        if stage < Wrapper
+          @stages << -> appender {
+            stage.new(appender, ...)
+          }
+          self
+        else
+          pipe(stage.new(...))
+        end
+      when /^[a-z]/
+        pipe(Appenders.public_send(stage, ...))
+      else
+        to_appender(stage)
+      end
+    end
+
+  private
+
+    def to_appender(appender)
+      @stages.reverse_each do |stage|
+        appender = stage.(appender)
+      end
+      appender
     end
   end
 end

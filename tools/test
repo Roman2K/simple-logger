@@ -5,5 +5,8 @@ require 'bundler'
 Bundler.require :default, :test
 
 require 'utils'
+require 'minitest/reporters'
+
+Minitest::Reporters.use! Minitest::Reporters::DefaultReporter.new
 
 Utils::TestFiles.load_from_argv dir: '.'

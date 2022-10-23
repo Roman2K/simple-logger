@@ -78,6 +78,44 @@ class AppendersTest < Minitest::Test
       DEBUG test duration="a string"
     EOS
   end
+
+  def test_pipe
+    io = StringIO.new
+
+    assert_respond_to Appenders.pipe(:IO, io), :append
+    refute_respond_to Appenders.pipe(:IO, io), :pipe
+
+    refute_respond_to Appenders.pipe(:Logfmt), :append
+    assert_respond_to Appenders.pipe(:Logfmt), :pipe
+
+    assert_respond_to Appenders.pipe(:Logfmt).pipe(:stderr), :append
+    refute_respond_to Appenders.pipe(:Logfmt).pipe(:stderr), :pipe
+  end
+
+  def test_pipe_nesting
+    io = StringIO.new
+
+    appender_outer = Class.new(Appenders::Wrapper) do
+      def append(entry)
+        super entry.merge(from_outer: true)
+      end
+    end
+
+    appender_inner = Class.new(Appenders::Wrapper) do
+      def append(entry)
+        super entry.merge(from_inner: true)
+      end
+    end
+
+    Appenders.
+      pipe(appender_outer).
+      pipe(appender_inner).
+      pipe(:Logfmt).
+      pipe(:IO, io).
+      append({msg: "hello"})
+
+    assert_equal "msg=hello from_outer from_inner\n", io.string
+  end
 end
 
 end
