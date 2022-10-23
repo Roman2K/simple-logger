@@ -20,15 +20,25 @@ module Appenders
     end
   end
 
-  class WithMutex
+  class Wrapper
     def initialize(appender)
       @appender = appender
+    end
+
+    def append(entry)
+      @appender.append(entry)
+    end
+  end
+
+  class WithMutex < Wrapper
+    def initialize(*)
+      super
       @mutex = Mutex.new
     end
 
     def append(entry)
       @mutex.synchronize do
-        @appender.append(entry)
+        super
       end
     end
   end
@@ -43,14 +53,14 @@ module Appenders
     end
   end
 
-  class Logfmt
+  class Logfmt < Wrapper
     def initialize(appender, **logfmt_opts)
-      @appender = appender
+      super(appender)
       @logfmt_format = Formatters::Logfmt.new(**logfmt_opts)
     end
 
     def append(entry)
-      @appender.append(format_entry(entry))
+      super(format_entry(entry))
     end
 
   protected
