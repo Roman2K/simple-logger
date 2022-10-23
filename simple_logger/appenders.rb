@@ -154,6 +154,23 @@ module Appenders
       appender
     end
   end
+
+  class OpenTelemetryContext < Wrapper
+    def append(entry)
+      super(entry.merge(open_telemetry_context_labels))
+    end
+
+  private
+
+    def open_telemetry_context_labels
+      span = OpenTelemetry::Trace.current_span
+
+      return {} unless span.recording?
+
+      { trace_id: span.context.hex_trace_id,
+        span_id: span.context.hex_span_id, }
+    end
+  end
 end
 
 end
